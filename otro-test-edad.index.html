@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: ¿Cuál es tu edad biológica? - Brainlab Corpore</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .phone-frame {
+            width: 375px;
+            height: 667px;
+            margin: 20px auto;
+            background: #000;
+            border-radius: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+        }
+        
+        .video-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: linear-gradient(145deg, #000000, #1a1a1a, #2a2a2a, #000000);
+            background-size: 400% 400%;
+            animation: gradientFlow 8s ease infinite;
+        }
+        
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            25% { background-position: 100% 50%; }
+            50% { background-position: 100% 100%; }
+            75% { background-position: 0% 100%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .neural-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.08;
+            background-image: 
+                radial-gradient(circle at 20% 20%, #6c5ce7 2px, transparent 2px),
+                radial-gradient(circle at 80% 30%, #a29bfe 2px, transparent 2px),
+                radial-gradient(circle at 40% 70%, #74b9ff 2px, transparent 2px),
+                radial-gradient(circle at 90% 80%, #ffffff 2px, transparent 2px);
+            background-size: 80px 80px, 120px 120px, 100px 100px, 150px 150px;
+            animation: neuralPulse 15s linear infinite;
+        }
+        
+        @keyframes neuralPulse {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(-10px, -10px); }
+            50% { transform: translate(10px, -5px); }
+            75% { transform: translate(-5px, 10px); }
+            100% { transform: translate(0, 0); }
+        }
+        
+        .content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 25px;
+            color: white;
+            z-index: 10;
+        }
+        
+        .logo {
+            position: absolute;
+            top: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(108, 92, 231, 0.5);
+            text-transform: uppercase;
+        }
+        
+        .hook {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe, #74b9ff, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: textShimmer 3s ease-in-out infinite;
+            line-height: 1.3;
+            text-align: center;
+        }
+        
+        @keyframes textShimmer {
+            0%, 100% { 
+                background-position: 0% 50%;
+                transform: scale(1); 
+            }
+            50% { 
+                background-position: 100% 50%;
+                transform: scale(1.02); 
+            }
+        }
+        
+        .test-container {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(25px);
+            border-radius: 24px;
+            padding: 28px;
+            margin: 15px 0;
+            border: 1px solid rgba(108, 92, 231, 0.3);
+            box-shadow: 
+                0 20px 60px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            width: 100%;
+            max-width: 290px;
+        }
+        
+        .question-counter {
+            font-size: 12px;
+            color: #a29bfe;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .question {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: slideInUp 0.6s ease forwards;
+            line-height: 1.4;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .option {
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(108, 92, 231, 0.4);
+            border-radius: 16px;
+            padding: 16px 18px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            animation: slideInUp 0.6s ease forwards;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option:nth-child(1) { animation-delay: 0.1s; }
+        .option:nth-child(2) { animation-delay: 0.2s; }
+        .option:nth-child(3) { animation-delay: 0.3s; }
+        .option:nth-child(4) { animation-delay: 0.4s; }
+        
+        .option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(108, 92, 231, 0.15), transparent);
+            transition: left 0.5s;
+        }
+        
+        .option:hover {
+            transform: translateY(-3px);
+            background: rgba(108, 92, 231, 0.15);
+            border-color: #6c5ce7;
+            box-shadow: 0 10px 30px rgba(108, 92, 231, 0.3);
+        }
+        
+        .option:hover::before {
+            left: 100%;
+        }
+        
+        .timer {
+            position: absolute;
+            top: 110px;
+            right: 25px;
+            font-size: 18px;
+            font-weight: 700;
+            background: rgba(108, 92, 231, 0.2);
+            color: #a29bfe;
+            padding: 8px 14px;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(108, 92, 231, 0.4);
+            animation: timerPulse 1s ease-in-out infinite;
+        }
+        
+        @keyframes timerPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .result {
+            display: none;
+            text-align: center;
+        }
+        
+        .result.show {
+            display: block;
+            animation: resultAppear 1s ease;
+        }
+        
+        .age-result {
+            font-size: 52px;
+            font-weight: 900;
+            margin: 25px 0;
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe, #74b9ff, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(108, 92, 231, 0.4);
+            animation: resultGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes resultGlow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+        
+        .result-message {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        
+        .cta {
+            position: absolute;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 30px;
+            animation: ctaBounce 3s ease infinite;
+            box-shadow: 
+                0 10px 30px rgba(108, 92, 231, 0.4),
+                0 0 20px rgba(162, 155, 254, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes resultAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        @keyframes ctaBounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-8px); }
+            60% { transform: translateX(-50%) translateY(-4px); }
+        }
+        
+        .progress-bar {
+            position: absolute;
+            bottom: 130px;
+            left: 25px;
+            right: 25px;
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6c5ce7, #a29bfe, #74b9ff);
+            width: 0%;
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+        
+        .brain-icon {
+            position: absolute;
+            top: 80px;
+            left: 25px;
+            font-size: 24px;
+            opacity: 0.7;
+            animation: brainPulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes brainPulse {
+            0%, 100% { 
+                transform: scale(1) rotate(0deg);
+                opacity: 0.7;
+            }
+            50% { 
+                transform: scale(1.1) rotate(5deg);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="video-container">
+            <div class="neural-bg"></div>
+            
+            <div class="content">
+                <div class="logo">Brainlab Corpore</div>
+                <div class="brain-icon">🧠</div>
+                <div class="timer" id="timer">15s</div>
+                
+                <div class="hook">
+                    Descubre tu<br>EDAD BIOLÓGICA<br>en 15 segundos
+                </div>
+                
+                <div class="test-container" id="testContainer">
+                    <div class="question-counter" id="questionCounter">Pregunta 1 de 8</div>
+                    <div class="question" id="question">
+                        ¿Cuántas horas duermes por noche normalmente?
+                    </div>
+                    <div class="options" id="options">
+                        <div class="option" onclick="selectOption(3)">Menos de 6 horas</div>
+                        <div class="option" onclick="selectOption(0)">6-7 horas</div>
+                        <div class="option" onclick="selectOption(-2)">7-8 horas</div>
+                        <div class="option" onclick="selectOption(-3)">Más de 8 horas</div>
+                    </div>
+                </div>
+                
+                <div class="result" id="result">
+                    <div style="font-size: 20px; font-weight: 600; margin-bottom: 8px;">
+                        Tu edad biológica es:
+                    </div>
+                    <div class="age-result" id="ageResult">25 años</div>
+                    <div class="result-message" id="resultMessage">
+                        ¡Tienes un cuerpo joven! 🎉
+                    </div>
+                    <div style="font-size: 13px; opacity: 0.7; margin-top: 15px;">
+                        *Basado en tus hábitos de vida actuales
+                    </div>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                
+                <div class="cta">
+                    💬 Comenta tu resultado
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        let timeLeft = 15;
+        let selectedAnswers = [];
+        let totalScore = 0;
+        
+        const questions = [
+            {
+                q: "¿Cuántas horas duermes por noche normalmente?",
+                options: [
+                    { text: "Menos de 6 horas", score: 3 },
+                    { text: "6-7 horas", score: 0 },
+                    { text: "7-8 horas", score: -2 },
+                    { text: "Más de 8 horas", score: -3 }
+                ]
+            },
+            {
+                q: "¿Con qué frecuencia haces ejercicio intenso?",
+                options: [
+                    { text: "Nunca", score: 4 },
+                    { text: "1 vez por semana", score: 2 },
+                    { text: "2-3 veces por semana", score: -1 },
+                    { text: "4+ veces por semana", score: -3 }
+                ]
+            },
+            {
+                q: "¿Cómo te sientes al despertar por las mañanas?",
+                options: [
+                    { text: "Muy cansado/a", score: 3 },
+                    { text: "Un poco cansado/a", score: 1 },
+                    { text: "Normal", score: 0 },
+                    { text: "Con mucha energía", score: -2 }
+                ]
+            },
+            {
+                q: "¿Cuántas porciones de frutas/verduras comes al día?",
+                options: [
+                    { text: "0-1 porciones", score: 3 },
+                    { text: "2-3 porciones", score: 1 },
+                    { text: "4-5 porciones", score: -1 },
+                    { text: "6+ porciones", score: -2 }
+                ]
+            },
+            {
+                q: "¿Con qué frecuencia te sientes estresado?",
+                options: [
+                    { text: "Constantemente", score: 4 },
+                    { text: "Frecuentemente", score: 2 },
+                    { text: "A veces", score: 0 },
+                    { text: "Rara vez", score: -2 }
+                ]
+            },
+            {
+                q: "¿Cuánta agua bebes al día?",
+                options: [
+                    { text: "Menos de 1 litro", score: 2 },
+                    { text: "1-1.5 litros", score: 1 },
+                    { text: "1.5-2 litros", score: -1 },
+                    { text: "Más de 2 litros", score: -2 }
+                ]
+            },
+            {
+                q: "¿Fumas o has fumado en el último año?",
+                options: [
+                    { text: "Sí, fumo regularmente", score: 6 },
+                    { text: "Fumo ocasionalmente", score: 3 },
+                    { text: "Dejé hace poco", score: 1 },
+                    { text: "No fumo", score: 0 }
+                ]
+            },
+            {
+                q: "¿Cuántas horas pasas sentado/a al día?",
+                options: [
+                    { text: "Más de 10 horas", score: 3 },
+                    { text: "8-10 horas", score: 2 },
+                    { text: "6-8 horas", score: 1 },
+                    { text: "Menos de 6 horas", score: -1 }
+                ]
+            }
+        ];
+        
+        function updateTimer() {
+            const timerEl = document.getElementById('timer');
+            timerEl.textContent = timeLeft + 's';
+            
+            if (timeLeft > 0) {
+                timeLeft--;
+                setTimeout(updateTimer, 1000);
+            } else {
+                showResult();
+            }
+        }
+        
+        function updateProgress() {
+            const progressFill = document.getElementById('progressFill');
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            progressFill.style.width = progress + '%';
+        }
+        
+        function selectOption(score) {
+            totalScore += score;
+            selectedAnswers.push(score);
+            nextQuestion();
+        }
+        
+        function nextQuestion() {
+            currentQuestion++;
+            updateProgress();
+            
+            if (currentQuestion < questions.length) {
+                const questionCounterEl = document.getElementById('questionCounter');
+                const questionEl = document.getElementById('question');
+                const optionsEl = document.getElementById('options');
+                
+                // Animación de salida
+                questionEl.style.opacity = '0';
+                optionsEl.style.opacity = '0';
+                
+                setTimeout(() => {
+                    // Actualizar contenido
+                    questionCounterEl.textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+                    questionEl.textContent = questions[currentQuestion].q;
+                    
+                    optionsEl.innerHTML = questions[currentQuestion].options
+                        .map(opt => `<div class="option" onclick="selectOption(${opt.score})">${opt.text}</div>`)
+                        .join('');
+                    
+                    // Animación de entrada
+                    questionEl.style.opacity = '1';
+                    optionsEl.style.opacity = '1';
+                }, 300);
+            } else {
+                showResult();
+            }
+        }
+        
+        function showResult() {
+            const testContainer = document.getElementById('testContainer');
+            const result = document.getElementById('result');
+            const ageResult = document.getElementById('ageResult');
+            const resultMessage = document.getElementById('resultMessage');
+            
+            // Calcular edad biológica
+            let biologicalAge = 28; // Edad base
+            biologicalAge += totalScore;
+            
+            // Limitar entre 18 y 70
+            biologicalAge = Math.max(18, Math.min(70, biologicalAge));
+            
+            // Determinar mensaje
+            let message, emoji;
+            if (biologicalAge < 25) {
+                message = "¡Tienes un cuerpo súper joven!";
+                emoji = "🌟";
+            } else if (biologicalAge < 30) {
+                message = "¡Tienes un cuerpo joven!";
+                emoji = "🎉";
+            } else if (biologicalAge < 35) {
+                message = "¡Estás en buena forma!";
+                emoji = "💪";
+            } else if (biologicalAge < 45) {
+                message = "Tu cuerpo necesita más cuidados";
+                emoji = "⚡";
+            } else {
+                message = "¡Es hora de cuidarte más!";
+                emoji = "🌱";
+            }
+            
+            // Mostrar resultado
+            testContainer.style.display = 'none';
+            result.classList.add('show');
+            ageResult.textContent = biologicalAge + ' años';
+            resultMessage.innerHTML = `${message} ${emoji}`;
+            
+            // Actualizar progreso al 100%
+            document.getElementById('progressFill').style.width = '100%';
+        }
+        
+        // Inicializar
+        updateTimer();
+        updateProgress();
+        
+        // Auto-advance después de 12 segundos si no hay interacción
+        setTimeout(() => {
+            if (currentQuestion === 0) {
+                selectOption(0); // Respuesta neutral
+            }
+        }, 12000);
+    </script>
+</body>
+</html>
